@@ -25,12 +25,13 @@ def start_game():
 
 class Game:
 
-    def __init__(self, width = 32, height = 24, cell_size = 20):
+    def __init__(self, width = 32, height = 24, cell_size = 20, speed = 15):
 
-        # size
+        # size and gameplay
         self.width = width
         self.height = height
         self.cell_size = cell_size
+        self.speed = speed
 
         # objects
         self.player = None
@@ -235,7 +236,7 @@ class Game:
         self.draw_score()
 
         pygame.display.update()
-        self.clock.tick(15)
+        self.clock.tick(self.speed)
 
 if __name__ == "__main__":
     start_game()
