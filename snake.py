@@ -1,10 +1,19 @@
 import pygame
 import sys
 import random
+from vector import vector
 
 __version__ = "0.0.3.dev"
 
+def draw_pt_as_rect(window, color, point, cell_size):
+        pygame.draw.rect(
+            window,
+            color,
+            pygame.Rect(point.x * cell_size, point.y * cell_size, cell_size, cell_size),
+        )    
+
 def start_game():
+
     pygame.init()
     
     g = Game()
@@ -12,203 +21,201 @@ def start_game():
     icon = pygame.image.load("snake.png")
     pygame.display.set_icon(icon)
     
-    window = pygame.display.set_mode((g.width * cell_size, g.height * cell_size))
+    window = pygame.display.set_mode((g.width * g.cell_size, g.height * g.cell_size))
     pygame.display.set_caption(f"Snake ({__version__})")
 
     while True:
-        g.update()
-        if g.quit:
+        g.update(window)
+        if g.do_exit:
             pygame.quit()
             sys.exit()
-            
 
 class Game:
 
     def __init__(self):
 
+        # size
         self.width = 32
         self.height = 24
         self.cell_size = 20
-        
+
+        # objects
         self.player = None
         self.body = None
         self.apple = None
 
+        # colors and view
         self.head_color = pygame.Color(0, 255, 0)
         self.body_color = pygame.Color(0, 255, 0)
         self.apple_color = pygame.Color(255, 0, 0)
         self.text_color = pygame.Color(255, 255, 255)
         self.bg_color = pygame.Color(0, 0, 0)
 
-        self.reset = True
+        self.font = pygame.font.Font(None, self.cell_size * 3)
 
-        self.font = pygame.font.Font(None, cell_size * 3)
+        # state
+        self.game_over = False
+        self.pause = False
+        self.do_exit = False
+        self.do_reset = False
+        self.score = 0
+
+        # player direction
+        self.direction = None
+        self.direction_stack = []
+
+        # direction by keys
+        self.direction_by_key = {}
+        self.direction_by_key[pygame.K_UP] = vector.up()
+        self.direction_by_key[pygame.K_DOWN] = vector.down()
+        self.direction_by_key[pygame.K_LEFT] = vector.left()
+        self.direction_by_key[pygame.K_RIGHT] = vector.right()
+
+        # clock
         self.clock = pygame.time.Clock()
 
-        self.direction_stack = []
-        self.pause = False
+        # reset gameplay
+        self.reset()
 
+    def random_empty_pos(self):
+        while True:
+            rnd_pos = vector(
+                random.randint(0, self.width - 1),
+                random.randint(0, self.height - 1),
+            )
+            if rnd_pos == self.player:
+                continue
+            if rnd_pos in self.body:
+                continue                    
+            return rnd_pos
+            
+    def reset(self):
+
+        # objects
+        self.player = vector(self.width // 2, self.height // 2)
+        self.body = []
+        self.apple = None
+
+        # player direction
+        self.direction = vector.zero()
+        self.direction_stack.clear()
+
+        # state
         self.game_over = False
+        self.pause = False
+        self.do_exit = False
+        self.do_reset = False
+        self.score = 0
 
-        self.quit = False
-
-        self.direction_by_key = {}
-        self.direction_by_key[pygame.K_UP] = (0, -1)
-        self.direction_by_key[pygame.K_DOWN] = (0, 1)
-        self.direction_by_key[pygame.K_LEFT] = (-1, 0)
-        self.direction_by_key[pygame.K_RIGHT] = (1, 0)
-
-    def active(self):
+    def is_active(self):
         return not (self.game_over or self.pause)
 
     def handle_event(self, event):
 
         if event.type == pygame.QUIT:
-                self.quit = True
+                self.do_exit = True
                 return
 
         if event.type == pygame.KEYDOWN:
             
             if event.key == pygame.K_q:
-                self.quit = True
+                self.do_exit = True
                 return
 
             if event.key == pygame.K_n:
-                self.reset = True
+                self.do_reset = True
                 return
 
             if event.key == pygame.K_p:
                 self.pause = not self.pause
                 return
 
-            if self.active:
+            if self.is_active():
                 new_direction = self.direction_by_key[event.key]
                 if new_direction:
-                    direction_stack.append(new_direction)
+                    self.direction_stack.append(new_direction)
 
-    def update(self):
-        
+    def update(self, window):
+
+        # handle incoming events
         for event in pygame.event.get():
             self.handle_event(event)
-            
-        if len(direction_stack):
-            new_direction = direction_stack.pop(0)
-            if direction[0] + new_direction[0] != 0 or direction[1] + new_direction[1] != 0:
-                direction = new_direction
 
-        if reset:
-            player = [width // 2, height // 2]
-            body = []
-            apple = None
-            direction = (0, 0)
-            score = 0
-            game_over = False
-            reset = False
-            direction_stack.clear()
+        # change direction by direction stack
+        if self.direction_stack:
+            new_direction = self.direction_stack.pop(0)
+            if not (self.direction + new_direction).is_zero():
+                self.direction = new_direction
 
-        if apple is None:
-            while True:
-                apple = [
-                    random.randint(0, width - 1),
-                    random.randint(0, height - 1),
-                ]
+        # reset
+        if self.do_reset:
+            self.reset()
 
-                apple_collide = False
-                if apple[0] == player[0] and apple[1] == player[1]:
-                    apple_collide = True
+        # create apple
+        if self.apple is None:
+            self.apple = self.random_empty_pos()
 
-                for body_part in body:
-                    if apple[0] == body_part[0] and apple[1] == body_part[1]:
-                        apple_collide = True
-                        break
+        new_pos = self.player.copy()
+        
+        # check game-over collide
+        if self.is_active():
+            new_pos.add(self.direction)            
+            if new_pos.x < 0 or new_pos.x >= self.width:
+                self.game_over = True
+            if new_pos.y < 0 or new_pos.y >= self.height:
+                self.game_over = True
+            if new_pos in self.body:
+                self.game_over = True
+        
+        if self.is_active():
+            self.body.insert(0, self.player.copy())
+            while len(self.body) > self.score:
+                self.body.pop()                
+            self.player = new_pos
+            if self.player == self.apple:
+                self.score += 1
+                self.apple = None
 
-                if apple_collide:
-                    continue
-                break
+        window.fill(self.bg_color)
 
-        new_pos = player[:]
-        if not (game_over or pause):
+        draw_pt_as_rect(window, self.head_color, self.player, self.cell_size)
+        
+        for body_part in self.body:
+            draw_pt_as_rect(window, self.body_color, body_part, self.cell_size)
 
-            new_pos[0] += direction[0]
-            new_pos[1] += direction[1]
+        if not self.apple is None:
+            draw_pt_as_rect(window, self.apple_color, self.apple, self.cell_size)
 
-            if new_pos[0] < 0 or new_pos[0] >= width:
-                game_over = True
-            if new_pos[1] < 0 or new_pos[1] >= height:
-                game_over = True
+        # text = font.render(f"Score: {score}", True, text_color)
+        # text_pos = text.get_rect(x=15, y=15)
+        # window.blit(text, text_pos)
 
-            for body_part in body:
-                if new_pos[0] == body_part[0] and new_pos[1] == body_part[1]:
-                    game_over = True
-                    break
+        # center_x = window.get_width() // 2
+        # center_y = window.get_height() // 2
 
-        if not (game_over or pause):
+        # if pause:
+        #     text = font.render(f"Pause", True, text_color)
+        #     text_pos = text.get_rect(
+        #         centerx=center_x, centery=center_y
+        #     )
+        #     window.blit(text, text_pos)
 
-            body.insert(0, player[:])
-            while len(body) > score:
-                body.pop()
+        # elif game_over:
 
-            player[0], player[1] = new_pos[0], new_pos[1]
-            if player[0] == apple[0] and player[1] == apple[1]:
-                score += 1
-                apple = None
+        #     text = font.render(f"Game Over", True, text_color)
+        #     text_pos = text.get_rect(
+        #         centerx=center_x, bottom=center_y
+        #     )
+        #     window.blit(text, text_pos)
 
-        window.fill(bg_color)
-
-        pygame.draw.rect(
-            window,
-            head_color,
-            pygame.Rect(player[0] * cell_size, player[1] * cell_size, cell_size, cell_size),
-        )
-
-        for body_part in body:
-            pygame.draw.rect(
-                window,
-                body_color,
-                pygame.Rect(
-                    body_part[0] * cell_size, body_part[1] * cell_size, cell_size, cell_size
-                ),
-            )
-
-        if not apple is None:
-            pygame.draw.rect(
-                window,
-                apple_color,
-                pygame.Rect(
-                    apple[0] * cell_size, apple[1] * cell_size, cell_size, cell_size
-                ),
-            )
-
-        text = font.render(f"Score: {score}", True, text_color)
-        text_pos = text.get_rect(x=15, y=15)
-        window.blit(text, text_pos)
-
-        center_x = window.get_width() // 2
-        center_y = window.get_height() // 2
-
-        if pause:
-            text = font.render(f"Pause", True, text_color)
-            text_pos = text.get_rect(
-                centerx=center_x, centery=center_y
-            )
-            window.blit(text, text_pos)
-
-        elif game_over:
-
-            text = font.render(f"Game Over", True, text_color)
-            text_pos = text.get_rect(
-                centerx=center_x, bottom=center_y
-            )
-            window.blit(text, text_pos)
-
-            text = font.render(f"Total Score: {score}", True, text_color)
-            text_pos = text.get_rect(
-                centerx=center_x, top=center_y
-            )
-            window.blit(text, text_pos)
+        #     text = font.render(f"Total Score: {score}", True, text_color)
+        #     text_pos = text.get_rect(
+        #         centerx=center_x, top=center_y
+        #     )
+        #     window.blit(text, text_pos)
 
         pygame.display.update()
-        clock.tick(15)
+        self.clock.tick(15)
 
 if __name__ == "__main__":
     start_game()
