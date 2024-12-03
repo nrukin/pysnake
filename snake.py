@@ -5,6 +5,7 @@ from vector import vector
 
 __version__ = "0.0.3.dev"
 
+
 def start_game():
 
     pygame.init()
@@ -12,26 +13,25 @@ def start_game():
     pygame.display.set_icon(icon)
     pygame.display.set_caption(f"Snake ({__version__})")
 
-    g = Game(
-        width = 32,
-        height = 24
-    )
-    
+    g = Game(width=32, height=24)
+
     while True:
         g.update()
         if g.do_exit:
             pygame.quit()
             sys.exit()
 
+
 class Game:
 
-    def __init__(self, width = 32, height = 24, cell_size = 20, speed = 15):
+    def __init__(self, width=32, height=24, cell_size=20, speed=15):
 
         # size and gameplay
+        self.speed = speed
         self.width = width
         self.height = height
         self.cell_size = cell_size
-        self.speed = speed
+        self.border = 10
 
         # objects
         self.player = None
@@ -69,19 +69,80 @@ class Game:
         self.clock = pygame.time.Clock()
 
         # main window
-        self.window = pygame.display.set_mode((self.width * self.cell_size, self.height * self.cell_size))
+        total_width = self.border * 2 + self.width * self.cell_size
+        total_height = self.border * 2 + self.height * self.cell_size
+        self.window = pygame.display.set_mode((total_width, total_height))
 
         # reset gameplay
         self.reset()
 
+    def draw_borders(self):
+
+        wh = self.window.get_height()
+        ww = self.window.get_width()
+
+        border_color = pygame.Color(0, 0, 255)
+
+        # top
+        pygame.draw.rect(
+            self.window,
+            border_color,
+            pygame.Rect(
+                0,
+                0,
+                ww,
+                self.border,
+            ),
+        )
+
+        # bottom
+        pygame.draw.rect(
+            self.window,
+            border_color,
+            pygame.Rect(
+                0,
+                wh - self.border,
+                ww,
+                self.border,
+            ),
+        )
+
+        # left
+        pygame.draw.rect(
+            self.window,
+            border_color,
+            pygame.Rect(
+                0,
+                self.border,
+                self.border,
+                ww - 2 * self.border,
+            ),
+        )
+
+        # right
+        pygame.draw.rect(
+            self.window,
+            border_color,
+            pygame.Rect(
+                ww - self.border,
+                self.border,
+                self.border,
+                wh - 2 * self.border,
+            ),
+        )
 
     def draw_pt_as_rect(self, color, point):
         pygame.draw.rect(
             self.window,
             color,
-            pygame.Rect(point.x * self.cell_size, point.y * self.cell_size, self.cell_size, self.cell_size),
-        )    
-        
+            pygame.Rect(
+                point.x * self.cell_size + self.border,
+                point.y * self.cell_size + self.border,
+                self.cell_size,
+                self.cell_size,
+            ),
+        )
+
     def random_empty_pos(self):
         while True:
             rnd_pos = vector(
@@ -91,9 +152,9 @@ class Game:
             if rnd_pos == self.player:
                 continue
             if rnd_pos in self.body:
-                continue                    
+                continue
             return rnd_pos
-            
+
     def reset(self):
 
         # objects
@@ -118,11 +179,11 @@ class Game:
     def handle_event(self, event):
 
         if event.type == pygame.QUIT:
-                self.do_exit = True
-                return
+            self.do_exit = True
+            return
 
         if event.type == pygame.KEYDOWN:
-            
+
             if event.key == pygame.K_q:
                 self.do_exit = True
                 return
@@ -144,20 +205,16 @@ class Game:
 
         if not self.game_over:
             return
-        
+
         center_x = self.window.get_width() // 2
         center_y = self.window.get_height() // 2
-        
+
         text = self.font.render(f"Game Over", True, self.text_color)
-        text_pos = text.get_rect(
-            centerx=center_x, bottom=center_y
-        )
+        text_pos = text.get_rect(centerx=center_x, bottom=center_y)
         self.window.blit(text, text_pos)
-        
+
         text = self.font.render(f"Total Score: {self.score}", True, self.text_color)
-        text_pos = text.get_rect(
-            centerx=center_x, top=center_y
-        )
+        text_pos = text.get_rect(centerx=center_x, top=center_y)
         self.window.blit(text, text_pos)
 
     def draw_pause(self):
@@ -167,19 +224,16 @@ class Game:
 
         center_x = self.window.get_width() // 2
         center_y = self.window.get_height() // 2
-        
+
         text = self.font.render(f"Pause", True, self.text_color)
-        text_pos = text.get_rect(
-           centerx=center_x, centery=center_y
-        )
+        text_pos = text.get_rect(centerx=center_x, centery=center_y)
         self.window.blit(text, text_pos)
 
     def draw_score(self):
         text = self.font.render(f"Score: {self.score}", True, self.text_color)
-        text_pos = text.get_rect(x=15, y=15)
-        self.window.blit(text, text_pos) 
+        text_pos = text.get_rect(x=2*self.border, y=2*self.border)
+        self.window.blit(text, text_pos)
 
-                    
     def update(self):
 
         # handle incoming events
@@ -201,30 +255,31 @@ class Game:
             self.apple = self.random_empty_pos()
 
         new_pos = self.player.copy()
-        
+
         # check game-over collide
         if self.is_active():
-            new_pos.add(self.direction)            
+            new_pos.add(self.direction)
             if new_pos.x < 0 or new_pos.x >= self.width:
                 self.game_over = True
             if new_pos.y < 0 or new_pos.y >= self.height:
                 self.game_over = True
             if new_pos in self.body:
                 self.game_over = True
-        
+
         if self.is_active():
             self.body.insert(0, self.player.copy())
             while len(self.body) > self.score:
-                self.body.pop()                
+                self.body.pop()
             self.player = new_pos
             if self.player == self.apple:
                 self.score += 1
                 self.apple = None
 
         self.window.fill(self.bg_color)
+        self.draw_borders()
 
         self.draw_pt_as_rect(self.head_color, self.player)
-        
+
         for body_part in self.body:
             self.draw_pt_as_rect(self.body_color, body_part)
 
@@ -237,6 +292,7 @@ class Game:
 
         pygame.display.update()
         self.clock.tick(self.speed)
+
 
 if __name__ == "__main__":
     start_game()
