@@ -4,8 +4,8 @@ import random
 
 __version__ = "0.0.3.dev"
 
-width = 64
-height = 48
+width = 32
+height = 24
 cell_size = 10
 
 head_color = pygame.Color(0, 255, 0)
