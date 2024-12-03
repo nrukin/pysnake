@@ -151,9 +151,19 @@ while True:
     window.blit(text, text_pos)
 
     if game_over:
-        text = font.render("Game Over", True, text_color)
+
+        center_x = window.get_width() // 2
+        center_y = window.get_height() // 2
+
+        text = font.render(f"Game Over", True, text_color)
         text_pos = text.get_rect(
-            centerx=window.get_width() // 2, centery=window.get_height() // 2
+            centerx=center_x, bottom=center_y
+        )
+        window.blit(text, text_pos)
+
+        text = font.render(f"Total Score: {score}", True, text_color)
+        text_pos = text.get_rect(
+            centerx=center_x, top=center_y
         )
         window.blit(text, text_pos)
 
