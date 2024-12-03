@@ -8,13 +8,15 @@ __version__ = "0.0.3.dev"
 def start_game():
 
     pygame.init()
-    
-    g = Game()
-
     icon = pygame.image.load("snake.png")
     pygame.display.set_icon(icon)
     pygame.display.set_caption(f"Snake ({__version__})")
 
+    g = Game(
+        width = 32,
+        height = 24
+    )
+    
     while True:
         g.update()
         if g.do_exit:
@@ -23,12 +25,12 @@ def start_game():
 
 class Game:
 
-    def __init__(self):
+    def __init__(self, width = 32, height = 24, cell_size = 20):
 
         # size
-        self.width = 32
-        self.height = 24
-        self.cell_size = 20
+        self.width = width
+        self.height = height
+        self.cell_size = cell_size
 
         # objects
         self.player = None
