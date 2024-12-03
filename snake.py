@@ -2,6 +2,8 @@ import pygame
 import sys
 import random
 
+__version__ = "0.0.2.dev"
+
 width = 64
 height = 48
 cell_size = 15
@@ -23,7 +25,7 @@ icon = pygame.image.load("snake.png")
 pygame.display.set_icon(icon)
 
 window = pygame.display.set_mode((width * cell_size, height * cell_size))
-pygame.display.set_caption("Snake")
+pygame.display.set_caption(f"Snake ({__version__})")
 
 direction_stack = []
 
