@@ -28,6 +28,7 @@ window = pygame.display.set_mode((width * cell_size, height * cell_size))
 pygame.display.set_caption(f"Snake ({__version__})")
 
 direction_stack = []
+pause = False
 
 while True:
 
@@ -45,7 +46,10 @@ while True:
             if event.key == pygame.K_n:
                 reset = True
 
-            if not game_over:
+            if event.key == pygame.K_p:
+                pause = not pause
+
+            if not (game_over or pause):
 
                 new_direction = None
                 if event.key == pygame.K_UP:
@@ -96,7 +100,7 @@ while True:
             break
 
     new_pos = player[:]
-    if not game_over:
+    if not (game_over or pause):
 
         new_pos[0] += direction[0]
         new_pos[1] += direction[1]
@@ -111,7 +115,7 @@ while True:
                 game_over = True
                 break
 
-    if not game_over:
+    if not (game_over or pause):
 
         body.insert(0, player[:])
         while len(body) > score:
@@ -152,10 +156,17 @@ while True:
     text_pos = text.get_rect(x=15, y=15)
     window.blit(text, text_pos)
 
-    if game_over:
+    center_x = window.get_width() // 2
+    center_y = window.get_height() // 2
 
-        center_x = window.get_width() // 2
-        center_y = window.get_height() // 2
+    if pause:
+        text = font.render(f"Pause", True, text_color)
+        text_pos = text.get_rect(
+            centerx=center_x, centery=center_y
+        )
+        window.blit(text, text_pos)
+
+    elif game_over:
 
         text = font.render(f"Game Over", True, text_color)
         text_pos = text.get_rect(
