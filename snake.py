@@ -169,6 +169,11 @@ class Game:
         )
         window.blit(text, text_pos)
 
+    def draw_score(self, window):
+        text = self.font.render(f"Score: {self.score}", True, self.text_color)
+        text_pos = text.get_rect(x=15, y=15)
+        window.blit(text, text_pos) 
+
                     
     def update(self, window):
 
@@ -223,6 +228,7 @@ class Game:
 
         self.draw_game_over(window)
         self.draw_pause(window)
+        self.draw_score(window)
 
         pygame.display.update()
         self.clock.tick(15)
