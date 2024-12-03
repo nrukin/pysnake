@@ -5,13 +5,6 @@ from vector import vector
 
 __version__ = "0.0.3.dev"
 
-def draw_pt_as_rect(window, color, point, cell_size):
-        pygame.draw.rect(
-            window,
-            color,
-            pygame.Rect(point.x * cell_size, point.y * cell_size, cell_size, cell_size),
-        )    
-
 def start_game():
 
     pygame.init()
@@ -20,12 +13,10 @@ def start_game():
 
     icon = pygame.image.load("snake.png")
     pygame.display.set_icon(icon)
-    
-    window = pygame.display.set_mode((g.width * g.cell_size, g.height * g.cell_size))
     pygame.display.set_caption(f"Snake ({__version__})")
 
     while True:
-        g.update(window)
+        g.update()
         if g.do_exit:
             pygame.quit()
             sys.exit()
@@ -74,9 +65,20 @@ class Game:
         # clock
         self.clock = pygame.time.Clock()
 
+        # main window
+        self.window = pygame.display.set_mode((self.width * self.cell_size, self.height * self.cell_size))
+
         # reset gameplay
         self.reset()
 
+
+    def draw_pt_as_rect(self, color, point):
+        pygame.draw.rect(
+            self.window,
+            color,
+            pygame.Rect(point.x * self.cell_size, point.y * self.cell_size, self.cell_size, self.cell_size),
+        )    
+        
     def random_empty_pos(self):
         while True:
             rnd_pos = vector(
@@ -135,47 +137,47 @@ class Game:
                 if new_direction:
                     self.direction_stack.append(new_direction)
 
-    def draw_game_over(self, window):
+    def draw_game_over(self):
 
         if not self.game_over:
             return
         
-        center_x = window.get_width() // 2
-        center_y = window.get_height() // 2
+        center_x = self.window.get_width() // 2
+        center_y = self.window.get_height() // 2
         
         text = self.font.render(f"Game Over", True, self.text_color)
         text_pos = text.get_rect(
             centerx=center_x, bottom=center_y
         )
-        window.blit(text, text_pos)
+        self.window.blit(text, text_pos)
         
         text = self.font.render(f"Total Score: {self.score}", True, self.text_color)
         text_pos = text.get_rect(
             centerx=center_x, top=center_y
         )
-        window.blit(text, text_pos)
+        self.window.blit(text, text_pos)
 
-    def draw_pause(self, window):
+    def draw_pause(self):
 
         if not self.pause:
             return
 
-        center_x = window.get_width() // 2
-        center_y = window.get_height() // 2
+        center_x = self.window.get_width() // 2
+        center_y = self.window.get_height() // 2
         
         text = self.font.render(f"Pause", True, self.text_color)
         text_pos = text.get_rect(
            centerx=center_x, centery=center_y
         )
-        window.blit(text, text_pos)
+        self.window.blit(text, text_pos)
 
-    def draw_score(self, window):
+    def draw_score(self):
         text = self.font.render(f"Score: {self.score}", True, self.text_color)
         text_pos = text.get_rect(x=15, y=15)
-        window.blit(text, text_pos) 
+        self.window.blit(text, text_pos) 
 
                     
-    def update(self, window):
+    def update(self):
 
         # handle incoming events
         for event in pygame.event.get():
@@ -216,19 +218,19 @@ class Game:
                 self.score += 1
                 self.apple = None
 
-        window.fill(self.bg_color)
+        self.window.fill(self.bg_color)
 
-        draw_pt_as_rect(window, self.head_color, self.player, self.cell_size)
+        self.draw_pt_as_rect(self.head_color, self.player)
         
         for body_part in self.body:
-            draw_pt_as_rect(window, self.body_color, body_part, self.cell_size)
+            self.draw_pt_as_rect(self.body_color, body_part)
 
         if not self.apple is None:
-            draw_pt_as_rect(window, self.apple_color, self.apple, self.cell_size)
+            self.draw_pt_as_rect(self.apple_color, self.apple)
 
-        self.draw_game_over(window)
-        self.draw_pause(window)
-        self.draw_score(window)
+        self.draw_game_over()
+        self.draw_pause()
+        self.draw_score()
 
         pygame.display.update()
         self.clock.tick(15)
