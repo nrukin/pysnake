@@ -135,6 +135,41 @@ class Game:
                 if new_direction:
                     self.direction_stack.append(new_direction)
 
+    def draw_game_over(self, window):
+
+        if not self.game_over:
+            return
+        
+        center_x = window.get_width() // 2
+        center_y = window.get_height() // 2
+        
+        text = self.font.render(f"Game Over", True, self.text_color)
+        text_pos = text.get_rect(
+            centerx=center_x, bottom=center_y
+        )
+        window.blit(text, text_pos)
+        
+        text = self.font.render(f"Total Score: {self.score}", True, self.text_color)
+        text_pos = text.get_rect(
+            centerx=center_x, top=center_y
+        )
+        window.blit(text, text_pos)
+
+    def draw_pause(self, window):
+
+        if not self.pause:
+            return
+
+        center_x = window.get_width() // 2
+        center_y = window.get_height() // 2
+        
+        text = self.font.render(f"Pause", True, self.text_color)
+        text_pos = text.get_rect(
+           centerx=center_x, centery=center_y
+        )
+        window.blit(text, text_pos)
+
+                    
     def update(self, window):
 
         # handle incoming events
@@ -186,33 +221,8 @@ class Game:
         if not self.apple is None:
             draw_pt_as_rect(window, self.apple_color, self.apple, self.cell_size)
 
-        # text = font.render(f"Score: {score}", True, text_color)
-        # text_pos = text.get_rect(x=15, y=15)
-        # window.blit(text, text_pos)
-
-        # center_x = window.get_width() // 2
-        # center_y = window.get_height() // 2
-
-        # if pause:
-        #     text = font.render(f"Pause", True, text_color)
-        #     text_pos = text.get_rect(
-        #         centerx=center_x, centery=center_y
-        #     )
-        #     window.blit(text, text_pos)
-
-        # elif game_over:
-
-        #     text = font.render(f"Game Over", True, text_color)
-        #     text_pos = text.get_rect(
-        #         centerx=center_x, bottom=center_y
-        #     )
-        #     window.blit(text, text_pos)
-
-        #     text = font.render(f"Total Score: {score}", True, text_color)
-        #     text_pos = text.get_rect(
-        #         centerx=center_x, top=center_y
-        #     )
-        #     window.blit(text, text_pos)
+        self.draw_game_over(window)
+        self.draw_pause(window)
 
         pygame.display.update()
         self.clock.tick(15)
