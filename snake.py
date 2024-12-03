@@ -14,7 +14,7 @@ def start_game():
     
     window = pygame.display.set_mode((g.width * cell_size, g.height * cell_size))
     pygame.display.set_caption(f"Snake ({__version__})")
-''
+
     while True:
         g.update()
         if g.quit:
