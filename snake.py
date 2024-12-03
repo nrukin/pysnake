@@ -6,7 +6,7 @@ __version__ = "0.0.2.dev"
 
 width = 64
 height = 48
-cell_size = 15
+cell_size = 10
 
 head_color = pygame.Color(0, 255, 0)
 body_color = pygame.Color(0, 255, 0)
@@ -17,7 +17,7 @@ bg_color = pygame.Color(0, 0, 0)
 reset = True
 
 pygame.init()
-font = pygame.font.Font(None, 60)
+font = pygame.font.Font(None, cell_size * 3)
 clock = pygame.time.Clock()
 
 
