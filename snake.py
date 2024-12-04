@@ -197,7 +197,7 @@ class Game:
                 return
 
             if self.is_active():
-                new_direction = self.direction_by_key[event.key]
+                new_direction = self.direction_by_key.get(event.key)
                 if new_direction:
                     self.direction_stack.append(new_direction)
 
