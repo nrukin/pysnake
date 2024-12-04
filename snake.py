@@ -53,6 +53,7 @@ class Game:
         self.do_exit = False
         self.do_reset = False
         self.score = 0
+        self.body_len = 0
 
         # player direction
         self.direction = None
@@ -172,6 +173,7 @@ class Game:
         self.do_exit = False
         self.do_reset = False
         self.score = 0
+        self.body_len = 3
 
     def is_active(self):
         return not (self.game_over or self.pause)
@@ -249,6 +251,7 @@ class Game:
         # reset
         if self.do_reset:
             self.reset()
+            return
 
         # create apple
         if self.apple is None:
@@ -257,7 +260,7 @@ class Game:
         new_pos = self.player.copy()
 
         # check game-over collide
-        if self.is_active():
+        if self.is_active() and not self.direction.is_zero():
             new_pos.add(self.direction)
             if new_pos.x < 0 or new_pos.x >= self.width:
                 self.game_over = True
@@ -268,11 +271,12 @@ class Game:
 
         if self.is_active():
             self.body.insert(0, self.player.copy())
-            while len(self.body) > self.score:
+            while len(self.body) > self.body_len:
                 self.body.pop()
             self.player = new_pos
             if self.player == self.apple:
                 self.score += 1
+                self.body_len += 3
                 self.apple = None
 
         self.window.fill(self.bg_color)
