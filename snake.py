@@ -79,58 +79,18 @@ class Game:
 
     def draw_borders(self):
 
-        wh = self.window.get_height()
-        ww = self.window.get_width()
+        def draw_border(left, top, width, height):
+            r = pygame.Rect(left, top, width, height)
+            border_color = pygame.Color(0, 0, 255)
+            pygame.draw.rect(self.window, border_color, r)
 
-        border_color = pygame.Color(0, 0, 255)
-
-        # top
-        pygame.draw.rect(
-            self.window,
-            border_color,
-            pygame.Rect(
-                0,
-                0,
-                ww,
-                self.border,
-            ),
-        )
-
-        # bottom
-        pygame.draw.rect(
-            self.window,
-            border_color,
-            pygame.Rect(
-                0,
-                wh - self.border,
-                ww,
-                self.border,
-            ),
-        )
-
-        # left
-        pygame.draw.rect(
-            self.window,
-            border_color,
-            pygame.Rect(
-                0,
-                self.border,
-                self.border,
-                ww - 2 * self.border,
-            ),
-        )
-
-        # right
-        pygame.draw.rect(
-            self.window,
-            border_color,
-            pygame.Rect(
-                ww - self.border,
-                self.border,
-                self.border,
-                wh - 2 * self.border,
-            ),
-        )
+        border_width = self.width * self.cell_size + self.border * 2
+        border_height = self.height * self.cell_size
+            
+        draw_border(0, 0, border_width, self.border)                                                    # top
+        draw_border(0, self.height * self.cell_size + self.border, border_width, self.border)           # bottom
+        draw_border(0, self.border, self.border, border_height)                                         # left
+        draw_border(self.width * self.cell_size + self.border, self.border, self.border, border_height) # right
 
     def draw_pt_as_rect(self, color, point):
         pygame.draw.rect(
