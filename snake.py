@@ -13,7 +13,7 @@ def start_game():
     pygame.display.set_icon(icon)
     pygame.display.set_caption(f"Snake ({__version__})")
 
-    g = Game(width=32, height=24)
+    g = Game(width=32, height=24, speed=12)
 
     while True:
         g.update()
@@ -24,7 +24,7 @@ def start_game():
 
 class Game:
 
-    def __init__(self, width=32, height=24, cell_size=20, speed=15):
+    def __init__(self, width=32, height=24, cell_size=20, speed=12):
 
         # size and gameplay
         self.speed = speed
