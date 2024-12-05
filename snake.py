@@ -71,7 +71,7 @@ class Game:
 
         # main window
         total_width = self.border * 2 + self.width * self.cell_size
-        total_height = self.border * 2 + self.height * self.cell_size
+        total_height = self.border * 2 + self.height * self.cell_size + 3 * self.cell_size
         self.window = pygame.display.set_mode((total_width, total_height))
 
         # reset gameplay
@@ -87,10 +87,10 @@ class Game:
         border_width = self.width * self.cell_size + self.border * 2
         border_height = self.height * self.cell_size
             
-        draw_border(0, 0, border_width, self.border)                                                    # top
-        draw_border(0, self.height * self.cell_size + self.border, border_width, self.border)           # bottom
-        draw_border(0, self.border, self.border, border_height)                                         # left
-        draw_border(self.width * self.cell_size + self.border, self.border, self.border, border_height) # right
+        draw_border(0, 3 * self.cell_size, border_width, self.border)                                                        # top
+        draw_border(0, 3 * self.cell_size + self.height * self.cell_size + self.border, border_width, self.border)           # bottom
+        draw_border(0, 3 * self.cell_size + self.border, self.border, border_height)                                         # left
+        draw_border(self.width * self.cell_size + self.border, 3 * self.cell_size + self.border, self.border, border_height) # right
 
     def draw_pt_as_rect(self, color, point):
         pygame.draw.rect(
@@ -98,7 +98,7 @@ class Game:
             color,
             pygame.Rect(
                 point.x * self.cell_size + self.border,
-                point.y * self.cell_size + self.border,
+                3 * self.cell_size + point.y * self.cell_size + self.border,
                 self.cell_size,
                 self.cell_size,
             ),
@@ -193,7 +193,7 @@ class Game:
 
     def draw_score(self):
         text = self.font.render(f"Score: {self.score}", True, self.text_color)
-        text_pos = text.get_rect(x=2*self.border, y=2*self.border)
+        text_pos = text.get_rect(x=self.cell_size // 2, y=self.cell_size // 2)
         self.window.blit(text, text_pos)
 
     def update(self):
