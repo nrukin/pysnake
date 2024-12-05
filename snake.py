@@ -2,8 +2,22 @@ import pygame
 import sys
 import random
 from vector import vector
+import datetime
 
 __version__ = "0.0.3.dev"
+
+class ScoreRecord:
+
+    def __init__(self, score, timestamp = None):
+        self.score = score
+        if timestamp:
+            self.timestamp - timestamp
+        else:
+            self.timestamp = datetime.datetime.now()
+
+    def __str__(self):
+        return f"Score: {self.score}; ts: {self.timestamp}"
+
 
 
 def start_game():
@@ -54,6 +68,8 @@ class Game:
         self.do_reset = False
         self.score = 0
         self.body_len = 0
+
+        self.records = []
 
         # player direction
         self.direction = None
@@ -163,6 +179,16 @@ class Game:
                 if new_direction:
                     self.direction_stack.append(new_direction)
 
+    def do_game_over(self):
+
+        print("game-over")
+        self.game_over = True
+        self.records.append(ScoreRecord(self.score))
+
+        for rec in self.records:
+            print(rec)
+        
+
     def draw_game_over(self):
 
         if not self.game_over:
@@ -223,11 +249,11 @@ class Game:
         if self.is_active() and not self.direction.is_zero():
             new_pos.add(self.direction)
             if new_pos.x < 0 or new_pos.x >= self.width:
-                self.game_over = True
+                self.do_game_over()
             if new_pos.y < 0 or new_pos.y >= self.height:
-                self.game_over = True
+                self.do_game_over()
             if new_pos in self.body:
-                self.game_over = True
+                self.do_game_over()
 
         if self.is_active():
             self.body.insert(0, self.player.copy())
