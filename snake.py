@@ -53,6 +53,7 @@ class Game:
 
         self.apple_count = 5
         self.apples = None
+        self.stones = []
 
         # colors and view
         self.head_color = pygame.Color(0, 255, 0)
@@ -156,6 +157,7 @@ class Game:
         self.player = vector(self.width // 2, self.height // 2)
         self.body = []
         self.apples = []
+        self.stones = []
 
         # player direction
         self.direction = vector.zero()
