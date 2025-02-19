@@ -236,12 +236,31 @@ class Game:
         self.window.blit(text, text_pos)
 
     def draw_grid(self):
-        pass
-        # pygame.draw.line(
-        #     self.window,
-        #     pygame.Color(255, 255, 255),
-        #     (0, 10), (50, 100))
 
+        grid_width = self.width * self.cell_size
+        grid_height = self.height * self.cell_size
+
+        x = 3 * self.cell_size + self.border
+        y = self.border
+
+        c = pygame.Color(40, 40, 40)
+
+        for i in range(self.width):
+            pygame.draw.line(
+                self.window,
+                c,
+                (y + i * self.cell_size, x),
+                (y + i * self.cell_size, x + grid_height),
+            )
+
+        for i in range(self.height):
+            pygame.draw.line(
+                self.window,
+                c,
+                (y, x + i * self.cell_size),
+                (y + grid_width, x + i * self.cell_size),
+            )
+    
     def update(self):
 
         # handle incoming events
