@@ -260,7 +260,7 @@ class Game:
                 (y, x + i * self.cell_size),
                 (y + grid_width, x + i * self.cell_size),
             )
-    
+
     def update(self):
 
         # handle incoming events
@@ -319,7 +319,6 @@ class Game:
         self.draw_game_over()
         self.draw_pause()
         self.draw_score()
-        
 
         pygame.display.update()
         self.clock.tick(self.speed)
