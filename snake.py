@@ -222,6 +222,9 @@ class Game:
         text_pos = text.get_rect(x=self.cell_size // 2, y=self.cell_size // 2)
         self.window.blit(text, text_pos)
 
+    def draw_grid(self):
+        pass
+
     def update(self):
 
         # handle incoming events
@@ -279,6 +282,7 @@ class Game:
         self.draw_game_over()
         self.draw_pause()
         self.draw_score()
+        self.draw_grid()
 
         pygame.display.update()
         self.clock.tick(self.speed)
