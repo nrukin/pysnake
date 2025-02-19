@@ -50,7 +50,9 @@ class Game:
         # objects
         self.player = None
         self.body = None
-        self.apple = None
+
+        self.apple_count = 5
+        self.apples = None
 
         # colors and view
         self.head_color = pygame.Color(0, 255, 0)
@@ -144,6 +146,8 @@ class Game:
                 continue
             if rnd_pos in self.body:
                 continue
+            if rnd_pos in self.apples:
+                continue
             return rnd_pos
 
     def reset(self):
@@ -151,7 +155,7 @@ class Game:
         # objects
         self.player = vector(self.width // 2, self.height // 2)
         self.body = []
-        self.apple = None
+        self.apples = []
 
         # player direction
         self.direction = vector.zero()
@@ -279,8 +283,8 @@ class Game:
             return
 
         # create apple
-        if self.apple is None:
-            self.apple = self.random_empty_pos()
+        while len(self.apples) < self.apple_count:
+            self.apples.append(self.random_empty_pos())
 
         new_pos = self.player.copy()
 
@@ -299,10 +303,12 @@ class Game:
             while len(self.body) > self.body_len:
                 self.body.pop()
             self.player = new_pos
-            if self.player == self.apple:
-                self.score += 1
-                self.body_len += 3
-                self.apple = None
+
+            for apple in self.apples:
+                if self.player == apple:
+                    self.score += 1
+                    self.body_len += 3
+                    self.apples.remove(apple)
 
         self.window.fill(self.bg_color)
         self.draw_borders()
@@ -312,8 +318,8 @@ class Game:
         for body_part in self.body:
             self.draw_pt_as_rect(self.body_color, body_part)
 
-        if not self.apple is None:
-            self.draw_pt_as_rect(self.apple_color, self.apple)
+        for apple in self.apples:
+            self.draw_pt_as_rect(self.apple_color, apple)
 
         self.draw_grid()
         self.draw_game_over()
