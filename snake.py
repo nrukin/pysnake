@@ -6,9 +6,10 @@ import datetime
 
 __version__ = "0.0.3.dev"
 
+
 class ScoreRecord:
 
-    def __init__(self, score, timestamp = None):
+    def __init__(self, score, timestamp=None):
         self.score = score
         if timestamp:
             self.timestamp - timestamp
@@ -17,7 +18,6 @@ class ScoreRecord:
 
     def __str__(self):
         return f"Score: {self.score}; ts: {self.timestamp}"
-
 
 
 def start_game():
@@ -87,7 +87,9 @@ class Game:
 
         # main window
         total_width = self.border * 2 + self.width * self.cell_size
-        total_height = self.border * 2 + self.height * self.cell_size + 3 * self.cell_size
+        total_height = (
+            self.border * 2 + self.height * self.cell_size + 3 * self.cell_size
+        )
         self.window = pygame.display.set_mode((total_width, total_height))
 
         # reset gameplay
@@ -102,11 +104,23 @@ class Game:
 
         border_width = self.width * self.cell_size + self.border * 2
         border_height = self.height * self.cell_size
-            
-        draw_border(0, 3 * self.cell_size, border_width, self.border)                                                        # top
-        draw_border(0, 3 * self.cell_size + self.height * self.cell_size + self.border, border_width, self.border)           # bottom
-        draw_border(0, 3 * self.cell_size + self.border, self.border, border_height)                                         # left
-        draw_border(self.width * self.cell_size + self.border, 3 * self.cell_size + self.border, self.border, border_height) # right
+
+        draw_border(0, 3 * self.cell_size, border_width, self.border)  # top
+        draw_border(
+            0,
+            3 * self.cell_size + self.height * self.cell_size + self.border,
+            border_width,
+            self.border,
+        )  # bottom
+        draw_border(
+            0, 3 * self.cell_size + self.border, self.border, border_height
+        )  # left
+        draw_border(
+            self.width * self.cell_size + self.border,
+            3 * self.cell_size + self.border,
+            self.border,
+            border_height,
+        )  # right
 
     def draw_pt_as_rect(self, color, point):
         pygame.draw.rect(
@@ -187,7 +201,6 @@ class Game:
 
         for rec in self.records:
             print(rec)
-        
 
     def draw_game_over(self):
 
@@ -224,6 +237,10 @@ class Game:
 
     def draw_grid(self):
         pass
+        # pygame.draw.line(
+        #     self.window,
+        #     pygame.Color(255, 255, 255),
+        #     (0, 10), (50, 100))
 
     def update(self):
 
