@@ -315,10 +315,11 @@ class Game:
         if not self.apple is None:
             self.draw_pt_as_rect(self.apple_color, self.apple)
 
+        self.draw_grid()
         self.draw_game_over()
         self.draw_pause()
         self.draw_score()
-        self.draw_grid()
+        
 
         pygame.display.update()
         self.clock.tick(self.speed)
