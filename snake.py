@@ -59,6 +59,7 @@ class Game:
         self.head_color = pygame.Color(0, 255, 0)
         self.body_color = pygame.Color(0, 255, 0)
         self.apple_color = pygame.Color(255, 0, 0)
+        self.stone_color = pygame.Color(255, 255, 255)
         self.text_color = pygame.Color(255, 255, 255)
         self.bg_color = pygame.Color(0, 0, 0)
 
@@ -311,6 +312,7 @@ class Game:
                     self.score += 1
                     self.body_len += 3
                     self.apples.remove(apple)
+                    self.stones.append(self.random_empty_pos())
 
         self.window.fill(self.bg_color)
         self.draw_borders()
@@ -322,6 +324,9 @@ class Game:
 
         for apple in self.apples:
             self.draw_pt_as_rect(self.apple_color, apple)
+
+        for stone in self.stones:
+            self.draw_pt_as_rect(self.stone_color, stone)
 
         self.draw_grid()
         self.draw_game_over()
