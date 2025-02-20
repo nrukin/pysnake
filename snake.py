@@ -59,7 +59,7 @@ class Game:
         self.head_color = pygame.Color(0, 255, 0)
         self.body_color = pygame.Color(0, 255, 0)
         self.apple_color = pygame.Color(255, 0, 0)
-        self.stone_color = pygame.Color(255, 255, 255)
+        self.stone_color = pygame.Color(222, 208, 13)
         self.text_color = pygame.Color(255, 255, 255)
         self.bg_color = pygame.Color(0, 0, 0)
 
@@ -299,6 +299,8 @@ class Game:
             if new_pos.y < 0 or new_pos.y >= self.height:
                 self.do_game_over()
             if new_pos in self.body:
+                self.do_game_over()
+            if new_pos in self.stones:
                 self.do_game_over()
 
         if self.is_active():
