@@ -72,6 +72,7 @@ class Game:
         self.do_reset = False
         self.score = 0
         self.body_len = 0
+        self.steps_after_apple = 0
 
         self.records = []
 
@@ -171,6 +172,7 @@ class Game:
         self.do_reset = False
         self.score = 0
         self.body_len = 3
+        self.steps_after_apple = 0
 
     def is_active(self):
         return not (self.game_over or self.pause)
@@ -308,13 +310,18 @@ class Game:
             while len(self.body) > self.body_len:
                 self.body.pop()
             self.player = new_pos
+            self.steps_after_apple += 1
 
             for apple in self.apples:
                 if self.player == apple:
-                    self.score += 1
+                    
+                    score_change = int(self.body_len / self.steps_after_apple * 10);
+                    #print(f"Yum; len={self.body_len}; steps={self.steps_after_apple}; score_change={score_change}")
+                    self.score += score_change
                     self.body_len += 3
                     self.apples.remove(apple)
                     self.stones.append(self.random_empty_pos())
+                    self.steps_after_apple = 0
 
         self.window.fill(self.bg_color)
         self.draw_borders()
